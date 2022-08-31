@@ -1,15 +1,17 @@
 import random
 import numpy as np
 import cv2
+from tqdm import tqdm
 
-HEIGHT, WIDTH = 500, 500
+HEIGHT, WIDTH = 400, 400
 OUT_DIR = 'images/'
 
-RED_ITERS = 2000
+global MAX_COLOR
+RED_ITERS = 20000
 GREEN_ITERS = 200
 BLUE_ITERS = 20
 
-nr_samples = 4000000
+nr_samples = 1000000
 max_val = 2.0
 minimum = -max_val - max_val * 1j
 maximum = max_val + max_val * 1j
@@ -41,7 +43,7 @@ def generate_points(c, nr_iterations):
         return result
 
 def color_image(nr_samples, nr_iterations, maximum, minimum, height, width, real_range, color):
-    for i in range(nr_samples):
+    for i in tqdm(range(nr_samples)):
         x = random.uniform(-2, 2)
         y = random.uniform(-2, 2)
         c = x + y * 1j
@@ -54,13 +56,22 @@ def color_image(nr_samples, nr_iterations, maximum, minimum, height, width, real
                 col = imag_to_col(point.imag, minimum = minimum, maximum = maximum, width = width, imag_range = imag_range) 
 
                 buddhabrot[row,col,colors[color]] += 1
-    
-if __name__ == "__main__":
-    buddhabrot = np.zeros((HEIGHT, WIDTH, 3), dtype = np.uint8)
 
-    color_image(nr_samples, RED_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range, 'red')
-    color_image(nr_samples, GREEN_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range, 'green')
-    color_image(nr_samples, BLUE_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range, 'blue')
+buddhabrot = np.zeros((HEIGHT, WIDTH, 3), dtype = np.uint64)
 
-    print("got here")
-    cv2.imwrite(OUT_DIR + 'buddhabrot.jpg', buddhabrot)  
+color_image(nr_samples, RED_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range, 'red')
+color_image(nr_samples, GREEN_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range, 'green')
+color_image(nr_samples, BLUE_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range, 'blue')
+
+max_value = np.max(buddhabrot)
+
+scale = 255 / max_value
+for row in range(HEIGHT):
+    for col in range(WIDTH):
+        buddhabrot[row,col,0] = np.uint8(buddhabrot[row,col,0] * scale)
+        buddhabrot[row,col,1] = np.uint8(buddhabrot[row,col,1] * scale)
+        buddhabrot[row,col,2] = np.uint8(buddhabrot[row,col,2] * scale)
+
+buddhabrot = buddhabrot.astype(np.uint8)
+
+cv2.imwrite(OUT_DIR + 'buddhabrotMoreRed.jpg', buddhabrot)  
