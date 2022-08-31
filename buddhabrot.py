@@ -7,11 +7,11 @@ HEIGHT, WIDTH = 400, 400
 OUT_DIR = 'images/'
 
 global MAX_COLOR
-RED_ITERS = 20000
+RED_ITERS = 2000
 GREEN_ITERS = 200
 BLUE_ITERS = 20
 
-nr_samples = 1000000
+nr_samples = 16000000
 max_val = 2.0
 minimum = -max_val - max_val * 1j
 maximum = max_val + max_val * 1j
@@ -66,12 +66,13 @@ color_image(nr_samples, BLUE_ITERS, maximum, minimum, HEIGHT, WIDTH, real_range,
 max_value = np.max(buddhabrot)
 
 scale = 255 / max_value
+
 for row in range(HEIGHT):
     for col in range(WIDTH):
-        buddhabrot[row,col,0] = np.uint8(buddhabrot[row,col,0] * scale)
-        buddhabrot[row,col,1] = np.uint8(buddhabrot[row,col,1] * scale)
-        buddhabrot[row,col,2] = np.uint8(buddhabrot[row,col,2] * scale)
+        buddhabrot[row,col,0] = buddhabrot[row,col,0] * scale
+        buddhabrot[row,col,1] = buddhabrot[row,col,1] * scale
+        buddhabrot[row,col,2] = buddhabrot[row,col,2] * scale
 
 buddhabrot = buddhabrot.astype(np.uint8)
 
-cv2.imwrite(OUT_DIR + 'buddhabrotMoreRed.jpg', buddhabrot)  
+cv2.imwrite(OUT_DIR + 'buddhabrotRedTwo.jpg', buddhabrot)
